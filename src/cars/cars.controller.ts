@@ -65,10 +65,7 @@ export class CarsController {
 
     // Creamos el metodo para borrar un car.
     @Delete(':id')
-    deleteCar( @Param('id', ParseIntPipe) id: number ) {
-       return {
-        method: 'Delete',
-        id
-       };
+    deleteCar( @Param('id', ParseUUIDPipe) id: string ) {
+       return this.carsService.delete( id );
     }
 }

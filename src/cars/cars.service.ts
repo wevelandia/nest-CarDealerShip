@@ -62,10 +62,18 @@ export class CarsService {
     update( id: string, updateCarDto: UpdateCarDto ) {
         // Aca definimos los que se hace actualizar el carro, pero si se maneja una Base de Dats elcódigo es más facil
         // Si pasa esta linea es porque tenemos un carro
+        console.log( {updateCarDto} );
+
         let carDB = this.findOneById( id );
 
+        // Realizamos una validación que si recibimos un id, y este es diferente del que se desea cambiar retornamos una excepción.
         if( updateCarDto.id && updateCarDto.id !== id )
             throw new BadRequestException(`Car id is not valid inside body`);
+
+        // Filtramos propiedades undefined de updateCarDto
+        const filteredDto = Object.fromEntries(
+            Object.entries(updateCarDto).filter(([_, value]) => value !== undefined)
+        );
 
         // Este map me permite iterar todos los elementos 
         // Iteramos sobre los autos y actualizamos el correspondiente
@@ -73,7 +81,11 @@ export class CarsService {
 
             if ( car.id === id ) {
                 // Lo que hacemos aca es que tomamos los datos de carDB y los actualizamos con los datos que vienen en updateCarDto, y como se envia tambien el id, con ello aseguramos que ese dato no se cambia. 
-                carDB = { ...carDB, ...updateCarDto, id }
+                carDB = { 
+                    ...carDB, 
+                    ...filteredDto, 
+                    id
+                }
                 return carDB;
             }
 
@@ -82,5 +94,16 @@ export class CarsService {
         })
 
         return carDB; // carro actualziado
+    }
+
+    // Creamos un nuevo metodo para borrar un carro.
+    delete( id: string ) {
+        
+        // Buscamos el Carro antes de Borrarlos.
+        let car = this.findOneById( id );
+        
+        // Retornamos los carros menos el seleccionado
+        this.cars = this.cars.filter( car => car.id !== id )
+
     }
 }
